@@ -12,7 +12,8 @@ b=np.array([6,6,6,6,6]) #gia preorder
 l=np.array([5,5,5,5,5,5,5,5]) #gia san xuat san pham
 q=np.array([8,8,8,8,8,8,8,8]) #gia ban san pham
 s=np.array([4,4,4,4,4]) #gia ban ton kho
-c=l-q
+c=l-q # coefficients
+
 
 print(c)
 A = np.random.randint(10, size=(8, 5))
@@ -20,8 +21,7 @@ print(A)
 y=[0] * m
 x=[0] * m
 z=[0] * n
-print("eeeee")
+ 
 print(y)
-i=Set(model, name = "preorder", )
-# print(D)
-m=5
+i=Set(model, name = "preorder",)
+j=Set(model, name = "optimize",)
