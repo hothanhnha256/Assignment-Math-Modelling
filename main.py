@@ -61,7 +61,7 @@ result=Model(
     equations=[e1,e2,e3,e4],
     problem="LP",
     sense=Sense.MIN ,
-    objective=b*x,
+    objective=b*x+1/2*((l-q)*z1-s*y1)+1/2*((l-q)*z2-s*y2),
     name="solver"
 )
 import sys
