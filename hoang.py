@@ -25,68 +25,69 @@ n=8 # i type product
 m=5 # j type material
 scenario = 2 # 2 scenario
 
-sc=Set(model, name ="sc", description="scenario", records= ["sc"+ str(k) for k in range (1, scenario + 1)])
-i=Set(model, name="i", description="productions", records=["i" + str(x) for x in range (1,n+1)])
-j=Set(model, name="j", description="materials", records=["j" + str(x) for x in range (1,m+1)])
+sc=Set(model, name ="sc", description="scenario", records= ["sc"+ str(k) for k in range (1, scenario + 1)],)
+i=Set(model, name="i", description="productions", records=["i" + str(x) for x in range (1,n+1)],)
+j=Set(model, name="j", description="materials", records=["j" + str(x) for x in range (1,m+1)],)
 
 b=Parameter(
     model, name="b", description="pre-order_cost",
     domain=j,
-    records= np.random.randint(1, 100, size=(1,m)),
+    records= np.random.randint(51, 100, size=(1,m)),
 )
 s=Parameter(
     model, name="s", description="inventory_cost",
     domain=j,
-    records= np.random.randint(1, 100, size=(1,m)),
+    records= np.random.randint(1, 50, size=(1,m)),
 )
 l=Parameter(
     model, name="l", description="production_cost",
     domain=i,
-    records= np.random.randint(1, 100, size=(1,n)),
+    records= np.random.randint(1, 50, size=(1,n)),
 )
 q=Parameter(
-    model, name="q", description="sale",
-    domain=i, 
-    records= np.random.randint(1, 100, size=(1,n)),
+    model, name="q", description="price product",
+    domain=i,
+    records= np.random.randint(151, 1000, size=(1,n)),
 )
 c=Parameter(
-    model, name="c", domain=i,
+    model, name="c", description="equation c= l-q",
+    domain=i,
 )
-c[i] = l[i] - q[i]
+c[i] = l[i]-q[i]
 
 ps=Parameter(
     model, name="ps", description="probability of scenario",
-    domain= sc,
+    domain=sc,
 )
-ps[sc]= 0.5
+ps[sc]= 1/scenario # records=np.array([0.5, 0.5]),
 
 d=Parameter(
-    model,  name="d",
+    model, name="d", description="demand",
     domain=[sc,i],
     records= np.random.binomial(10, 0.5, size=(scenario,n)),
 )
 a=Parameter(
     container=model, name="a",
-    domain=[i, j],
+    domain=[i,j],
     # matrix A(n x m)
     description="aij",
-    records= np.random.randint(10, size=(8, 5))
+    records= np.random.randint(10, size=(8, 5)),
 )
 
 x=Variable(
     model, name="x",
-    domain= j,
+    domain=j,
     type="positive", description="Sum pre-order_material",
 )
 y=Variable(
     model, name="y",
-    domain= j,
-    type="positive", description="inventory"
+    domain=j,
+    type="positive", description="inventory",
 )
 z=Variable(
     model, name="z",
-    domain= i,
-    type="positive", description="production"
+    domain=i,
+    type="positive", description="production",
 )
 
 supply1 = Equation(
@@ -95,25 +96,26 @@ supply1 = Equation(
 supply1[j] = x[j] >= 0
 
 supply2 = Equation(
-    model,  name="supply2", domain=j, 
+    model,  name="supply2", domain=j,
 )
 # y[j] = x[j] - Sum(i, a[i,j]*z[i]) >= 0
 supply2[j] = x[j] - Sum(i, a[i,j]*z[i]) >= 0
 
 supply3 = Equation(
-    model,  name="supply3",  domain=[i,j], 
+    model,  name="supply3",  domain=[i,j],
 )
 supply3[i,j] = a[i,j] >= 0
 
+#!!!  đang có vấn đề(chưa nên add vô Model) :: Exec Error at line 57: Equation infeasible due to rhs value
 supply4 = Equation(
-    model,  name="supply4",  domain=j, 
+    model,  name="supply4",  domain=j,
 )
 supply4[j] = s[j] < b[j]
-
+######################################################
 demand1 = Equation(
-    model, name="demand1",  domain=i, 
+    model, name="demand1",  domain=[sc,i],
 )
-demand1[i] = z[i] <= d[i]
+demand1[sc,i] = d[sc,i] >= z[i]
 
 demand2 = Equation(
     model, name="demand2", domain=i, 
@@ -123,7 +125,7 @@ demand2[i] = z[i] >= 0
 #! equation 7+8
 equation78 = Model(
     model, name="equation78",
-    equations=[supply1, supply2, supply3, supply4, demand1, demand2],
+     equations=[supply1, supply2, supply3, demand1, demand2],
     problem="LP",
     #tính min
     sense=Sense.MIN,
