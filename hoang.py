@@ -1,5 +1,4 @@
-print("---------------Start World!-----------------\n")
-
+print("---------------Start Program!-----------------\n")
 #! convert the sample problem into BTL
     #* Indices (Sets):
     #*             i = product, j = material
@@ -34,22 +33,22 @@ j=Set(model, name="j", description="materials", records=["j" + str(x) for x in r
 b=Parameter(
     model, name="b", description="pre-order_cost",
     domain=j,
-    records= np.random.randint(51, 100, size=(1,m)),
+    records= np.random.randint(100, 500, size=(1,m)),
 )
 s=Parameter(
     model, name="s", description="inventory_cost",
     domain=j,
-    records= np.random.randint(1, 50, size=(1,m)),
+    records= np.random.randint(1, 99, size=(1,m)),
 )
 l=Parameter(
     model, name="l", description="production_cost",
     domain=i,
-    records= np.random.randint(1, 50, size=(1,n)),
+    records= np.random.randint(100, 500, size=(1,n)),
 )
 q=Parameter(
     model, name="q", description="price product",
     domain=i,
-    records= np.random.randint(151, 1000, size=(1,n)),
+    records= np.random.randint(1000, 10000, size=(1,n)),
 )
 c=Parameter(
     model, name="c", description="equation c= l-q",
@@ -72,23 +71,23 @@ a=Parameter(
     domain=[i,j],
     # matrix A(n x m)
     description="aij",
-    records= np.random.randint(10, size=(8, 5)),
+    records= np.random.randint(1,10, size=(8, 5)),
 )
 
 x=Variable(
     model, name="x",
     domain=j,
-    type="positive", description="Sum pre-order_material",
+    type="free", description="Sum pre-order_material",
 )
 y=Variable(
     model, name="y",
     domain=[sc,j],
-    type="positive", description="inventory",
+    type="free", description="inventory",
 )
 z=Variable(
     model, name="z",
     domain=[sc,i],
-    type="positive", description="production",
+    type="free", description="production",
 )
 
 # a[i,j] >= 0 đã được thể hiện trong parameter a
@@ -121,7 +120,16 @@ equation78 = Model(
     objective= Sum(j, b[j]*x[j]) + Sum(sc, ps[sc]*(Sum(i, c[i]*z[sc,i]) - Sum(j, s[j]*y[sc,j]))),
 )
 
-#  solve
+#  solve : giải optimal
 import sys
-equation78.solve(output=sys.stdout)
+#in ra toàn bộ chương trình
+    # equation78.solve(output=sys.stdout)
+equation78.solve()
+print("\nThe solution X of the equation is: ")
+print(x.records)
+print("\nThe solution Y of the equation is: ")
+print(y.records)
+print("\nThe solution Z of the equation is: ")
+print(z.records)
+print(f'Optimal solution found = {equation78.objective_value}')
 print("\n----------------End program----------------")
