@@ -27,9 +27,9 @@ n=8 # i type product
 m=5 # j type material
 scenario = 2 # 2 scenario
 
-sc=Set(model, name ="sc", description="scenario", records= ["sc"+ str(k) for k in range (1, scenario + 1)],)
-i=Set(model, name="i", description="productions", records=["i" + str(x) for x in range (1,n+1)],)
-j=Set(model, name="j", description="materials", records=["j" + str(x) for x in range (1,m+1)],)
+sc=Set(model, name ="sc", description="scenario", records= ["sc"+ str(k) for k in range (1, scenario + 1)])
+i=Set(model, name="i", description="productions", records=["i" + str(x) for x in range (1,n+1)])
+j=Set(model, name="j", description="materials", records=["j" + str(x) for x in range (1,m+1)])
 
 b=Parameter(
     model, name="b", description="pre-order_cost",
@@ -87,7 +87,7 @@ y=Variable(
 )
 z=Variable(
     model, name="z",
-    domain=i,
+    domain=[sc,i],
     type="positive", description="production",
 )
 
